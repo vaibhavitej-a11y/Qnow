@@ -1,0 +1,121 @@
+.queue-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  animation: slideUp 0.4s ease forwards;
+  opacity: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.queue-card-next {
+  border-color: var(--border-accent) !important;
+  animation: slideUp 0.4s ease forwards, glow 3s ease-in-out infinite;
+}
+
+.queue-card-position {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-glass);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.position-number {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.queue-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.patient-name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appointment-badge {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.queue-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.meta-divider {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.queue-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.next-indicator {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent-primary);
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Staggered animation for list items */
+.queue-card:nth-child(1) { animation-delay: 0.05s; }
+.queue-card:nth-child(2) { animation-delay: 0.1s; }
+.queue-card:nth-child(3) { animation-delay: 0.15s; }
+.queue-card:nth-child(4) { animation-delay: 0.2s; }
+.queue-card:nth-child(5) { animation-delay: 0.25s; }
+.queue-card:nth-child(6) { animation-delay: 0.3s; }
+.queue-card:nth-child(7) { animation-delay: 0.35s; }
+.queue-card:nth-child(8) { animation-delay: 0.4s; }
+
+@media (max-width: 600px) {
+  .queue-card {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .queue-card-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

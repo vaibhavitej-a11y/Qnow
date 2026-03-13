@@ -1,0 +1,26 @@
+.app-main {
+  flex: 1;
+  position: relative;
+}
+
+/* Subtle background decoration */
+.app-main::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    ellipse at 20% 50%,
+    rgba(6, 214, 160, 0.03) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    ellipse at 80% 50%,
+    rgba(0, 180, 216, 0.03) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+  z-index: -1;
+}

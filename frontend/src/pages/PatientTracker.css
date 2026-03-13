@@ -1,0 +1,317 @@
+.tracker-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+}
+
+.tracker-container {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ── Status Banner ────────────────────────────────────────── */
+.tracker-status {
+  width: 100%;
+  text-align: center;
+  padding: 14px 20px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.status-seen {
+  background: rgba(6, 214, 160, 0.12);
+  color: var(--accent-primary);
+  border: 1px solid rgba(6, 214, 160, 0.25);
+}
+
+.status-next {
+  background: rgba(6, 214, 160, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid rgba(6, 214, 160, 0.3);
+  animation: glow 2s ease-in-out infinite;
+}
+
+.status-close {
+  background: rgba(255, 209, 102, 0.12);
+  color: var(--accent-warning);
+  border: 1px solid rgba(255, 209, 102, 0.25);
+}
+
+.status-waiting {
+  background: rgba(0, 180, 216, 0.1);
+  color: var(--accent-secondary);
+  border: 1px solid rgba(0, 180, 216, 0.2);
+}
+
+/* ── Position Ring ────────────────────────────────────────── */
+.tracker-position-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.position-ring {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+.progress-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progress-bg {
+  fill: none;
+  stroke: rgba(148, 163, 184, 0.1);
+  stroke-width: 6;
+}
+
+.progress-fill {
+  fill: none;
+  stroke: url(#gradient) var(--accent-primary);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+  filter: drop-shadow(0 0 6px rgba(6, 214, 160, 0.4));
+}
+
+.position-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.position-hash {
+  font-size: var(--font-size-2xl);
+  font-weight: 300;
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+
+.position-num {
+  font-size: var(--font-size-6xl);
+  font-weight: 900;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.position-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Seen State ───────────────────────────────────────────── */
+.tracker-seen-area {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.seen-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  animation: float 2s ease-in-out infinite;
+}
+
+.tracker-seen-area h2 {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.tracker-seen-area p {
+  color: var(--text-muted);
+}
+
+/* ── Wait Estimate Card ───────────────────────────────────── */
+.tracker-wait {
+  width: 100%;
+  padding: 24px;
+  text-align: center;
+}
+
+.wait-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.wait-icon {
+  font-size: 1.2rem;
+}
+
+.wait-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.wait-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.wait-number {
+  font-size: var(--font-size-4xl);
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.wait-unit {
+  font-size: var(--font-size-lg);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.wait-now {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ── Patient Info ─────────────────────────────────────────── */
+.tracker-info {
+  width: 100%;
+  padding: 20px 24px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.info-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.info-value {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.info-divider {
+  height: 1px;
+  background: var(--border-default);
+}
+
+/* ── Progress Bar ─────────────────────────────────────────── */
+.tracker-progress {
+  width: 100%;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  transition: width 1s ease;
+  box-shadow: 0 0 10px rgba(6, 214, 160, 0.3);
+  animation: progressPulse 2s ease-in-out infinite;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.tracker-footer {
+  padding-top: 16px;
+  text-align: center;
+}
+
+.tracker-footer p {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.tracker-footer strong {
+  color: var(--accent-primary);
+}
+
+/* ── Loading / Error ──────────────────────────────────────── */
+.tracker-loading {
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.loading-spinner.large {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border-default);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+.tracker-loading p {
+  color: var(--text-muted);
+}
+
+.tracker-error {
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.tracker-error h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.tracker-error p {
+  color: var(--text-muted);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

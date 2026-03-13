@@ -1,0 +1,157 @@
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.dashboard-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  animation: fadeIn 0.5s ease;
+}
+
+.dashboard-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.dashboard-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ── Queue List ───────────────────────────────────────────── */
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.queue-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.queue-count {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.queue-item-wrapper {
+  position: relative;
+}
+
+.copy-link-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  opacity: 0.6;
+}
+
+.copy-link-btn:hover {
+  opacity: 1;
+  color: var(--accent-primary);
+  background: var(--bg-glass);
+}
+
+/* ── Empty State ──────────────────────────────────────────── */
+.dashboard-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.dashboard-empty h3 {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.dashboard-empty p {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* ── Loading ──────────────────────────────────────────────── */
+.dashboard-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  animation: fadeIn 0.4s ease;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border-default);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.dashboard-loading p {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .dashboard-top {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .dashboard-actions {
+    width: 100%;
+  }
+  .dashboard-actions .btn-primary,
+  .dashboard-actions .btn-secondary {
+    flex: 1;
+    text-align: center;
+  }
+  .copy-link-btn {
+    position: static;
+    display: block;
+    text-align: right;
+    padding: 4px 20px 12px;
+  }
+}

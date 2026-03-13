@@ -1,0 +1,4 @@
+# QNow Database Files
+# These are auto-generated JSON files used as the file-based database.
+# They are regenerated at runtime — safe to delete for a fresh start.
+*.json
