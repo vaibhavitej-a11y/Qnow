@@ -1,36 +1,46 @@
 """
-Patient management API endpoints.
+Patient management API endpoints for QNow 2.0.
 """
 
 from flask import Blueprint, request, jsonify
-from models.store import add_patient, get_patient, get_all_patients, APPOINTMENT_TYPES
+from models.store import add_patient, get_patient, get_all_patients, APPOINTMENT_TYPES, queue
 from services.predictor import predict_wait_for_patient, predict_all_waits
-from models.store import queue
+from ws.socket import trigger_update
 
 patients_bp = Blueprint("patients", __name__)
 
 
 @patients_bp.route("/api/patients", methods=["POST"])
 def create_patient():
-    """Add a new patient to the queue."""
+    """Add a new patient to the queue (with Emergency and Symptoms)."""
     data = request.get_json()
 
     name = data.get("name", "").strip()
-    appointment_type = data.get("appointment_type", "checkup")
+    age = data.get("age", "")
     phone = data.get("phone", "")
+    symptoms = data.get("symptoms", "")
+    appointment_type = data.get("appointment_type", "checkup")
+    
+    # Ensure boolean
+    is_emergency = data.get("is_emergency", False)
+    if isinstance(is_emergency, str):
+        is_emergency = is_emergency.lower() == "true"
 
     if not name:
         return jsonify({"error": "Patient name is required"}), 400
 
     if appointment_type not in APPOINTMENT_TYPES:
-        return jsonify({"error": f"Invalid appointment type. Choose from: {list(APPOINTMENT_TYPES.keys())}"}), 400
+        appointment_type = "checkup"
 
-    patient = add_patient(name, appointment_type, phone)
+    patient = add_patient(name, age, phone, symptoms, appointment_type, is_emergency)
 
     # Calculate wait estimate
     wait_estimate = predict_wait_for_patient(patient["id"])
     patient["estimated_wait"] = wait_estimate
-    patient["position"] = len(queue)
+    patient["position"] = queue.index(patient["id"]) + 1 if patient["id"] in queue else None
+
+    # Broadcast new state
+    trigger_update()
 
     return jsonify(patient), 201
 

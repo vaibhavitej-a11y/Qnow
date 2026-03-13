@@ -8,44 +8,35 @@ from flask_socketio import SocketIO
 
 from routes.patients import patients_bp
 from routes.queue import queue_bp
-from ws.socket import register_socket_events, emit_queue_update
+from routes.meta import doctors_bp, hospitals_bp
+from routes.triage import triage_bp
+from ws.socket import init_socketio
 
-# ── App Setup ─────────────────────────────────────────────────────
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "qnow-mvp-secret"
+app.config["SECRET_KEY"] = "qnow_secret_mvp_v2"
 
+# ── Setup CORS & WebSockets ──────────────────────────────────────
+# Allow requests from Vite dev server explicitly
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
-
-# ── Register Blueprints ──────────────────────────────────────────
+# ── Register Routes ──────────────────────────────────────────────
 app.register_blueprint(patients_bp)
 app.register_blueprint(queue_bp)
+app.register_blueprint(doctors_bp)
+app.register_blueprint(hospitals_bp)
+app.register_blueprint(triage_bp)
 
-# ── Register WebSocket Events ────────────────────────────────────
-register_socket_events(socketio)
-
-
-# ── Wrap queue-modifying endpoints to emit WS updates ────────────
-@app.after_request
-def after_request(response):
-    """After any POST/DELETE that modifies the queue, broadcast update."""
-    from flask import request as req
-    if req.method in ("POST", "DELETE") and "/api/queue" in req.path or "/api/patients" in req.path:
-        try:
-            emit_queue_update(socketio)
-        except Exception:
-            pass  # Don't fail the request if WS broadcast fails
-    return response
+# ── Initialize WebSockets ────────────────────────────────────────
+init_socketio(socketio)
 
 
-# ── Health Check ─────────────────────────────────────────────────
-@app.route("/api/health", methods=["GET"])
+@app.route("/api/health")
 def health():
-    return {"status": "ok", "service": "QNow API"}
+    return {"status": "ok", "version": "2.0"}
 
 
 # ── Run ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    print("\n[QNow] Backend running on http://localhost:5000\n")
+    print("\n[QNow v2.0] Backend running on http://localhost:5000\n")
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)

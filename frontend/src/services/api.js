@@ -1,5 +1,5 @@
 /**
- * QNow API Service — REST + Socket.IO client
+ * QNow 2.0 API Service — REST + Socket.IO client
  */
 import { io } from 'socket.io-client';
 
@@ -22,71 +22,79 @@ async function request(endpoint, options = {}) {
 
 // ── Patient API ──────────────────────────────────────────────
 
-export async function addPatient(name, appointmentType, phone = '') {
-  return request('/patients', {
-    method: 'POST',
-    body: JSON.stringify({ name, appointment_type: appointmentType, phone }),
-  });
-}
-
-export async function getPatient(patientId) {
-  return request(`/patients/${patientId}`);
-}
-
-export async function getAllPatients() {
-  return request('/patients');
-}
-
-export async function getAppointmentTypes() {
-  return request('/appointment-types');
-}
+export const patientApi = {
+  add: async (data) => {
+    return request('/patients', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  getDetails: async (patientId) => {
+    return request(`/patients/${patientId}`);
+  },
+  getAll: async () => {
+    return request('/patients');
+  },
+  getAppointmentTypes: async () => {
+    return request('/appointment-types');
+  },
+  analyzeTriage: async (symptoms, age, isEmergency) => {
+    return request('/triage/analyze', {
+      method: "POST",
+      body: JSON.stringify({ symptoms, age, is_emergency: isEmergency }),
+    });
+  }
+};
 
 // ── Queue API ────────────────────────────────────────────────
 
-export async function getQueue() {
-  return request('/queue');
-}
+export const queueApi = {
+  getQueue: async () => {
+    return request('/queue');
+  },
+  markNext: async () => {
+    return request('/queue/next', { method: 'POST' });
+  },
+  markSeen: async (patientId) => {
+    return request(`/queue/mark-seen/${patientId}`, { method: 'POST' });
+  },
+  remove: async (patientId) => {
+    return request(`/queue/${patientId}`, { method: 'DELETE' });
+  }
+};
 
-export async function markNextPatient() {
-  return request('/queue/next', { method: 'POST' });
-}
+// ── Stats & Meta API ─────────────────────────────────────────
 
-export async function markPatientSeen(patientId) {
-  return request(`/queue/mark/${patientId}`, { method: 'POST' });
-}
-
-export async function removePatient(patientId) {
-  return request(`/queue/${patientId}`, { method: 'DELETE' });
-}
-
-// ── Stats API ────────────────────────────────────────────────
-
-export async function getStats() {
-  return request('/stats');
-}
+export const metaApi = {
+  getStats: async () => {
+    return request('/queue/stats');
+  },
+  getDoctors: async () => {
+    return request('/doctors');
+  },
+  getHospitals: async () => {
+    return request('/hospitals');
+  }
+};
 
 // ── WebSocket ────────────────────────────────────────────────
 
-export function connectSocket(onQueueUpdate) {
+export function connectSocket(callbacks) {
   if (socket) return socket;
 
   socket = io('http://localhost:5000', {
     transports: ['websocket', 'polling'],
     reconnectionAttempts: 10,
-    reconnectionDelay: 1000,
   });
 
-  socket.on('connect', () => {
-    console.log('[WS] Connected');
-  });
+  socket.on('connect', () => console.log('[WS] Connected'));
 
-  socket.on('disconnect', () => {
-    console.log('[WS] Disconnected');
-  });
-
-  socket.on('queue_updated', (data) => {
-    if (onQueueUpdate) onQueueUpdate(data);
-  });
+  if (callbacks) {
+    if (callbacks.onQueue) socket.on('queue_updated', callbacks.onQueue);
+    if (callbacks.onMeta) socket.on('meta_updated', callbacks.onMeta);
+    if (callbacks.onDoctors) socket.on('doctors_updated', callbacks.onDoctors);
+    if (callbacks.onHospitals) socket.on('hospitals_updated', callbacks.onHospitals);
+  }
 
   return socket;
 }
@@ -95,11 +103,5 @@ export function disconnectSocket() {
   if (socket) {
     socket.disconnect();
     socket = null;
-  }
-}
-
-export function joinPatientRoom(patientId) {
-  if (socket) {
-    socket.emit('join_patient', { patient_id: patientId });
   }
 }
