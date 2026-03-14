@@ -58,6 +58,9 @@ export const queueApi = {
   markSeen: async (patientId) => {
     return request(`/queue/mark-seen/${patientId}`, { method: 'POST' });
   },
+  markDeceased: async (patientId) => {
+    return request(`/queue/mark-deceased/${patientId}`, { method: 'POST' });
+  },
   remove: async (patientId) => {
     return request(`/queue/${patientId}`, { method: 'DELETE' });
   }

@@ -124,6 +124,20 @@ function QueueTab({ queue }) {
                     ✓ Mark Seen
                   </button>
                   <button
+                    onClick={() => {
+                      if (window.confirm(`Are you sure you want to mark ${patient.name} as Deceased/DOA?`)) {
+                        queueApi.markDeceased(patient.id).catch(console.error);
+                      }
+                    }}
+                    style={{
+                      background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)",
+                      color: "rgba(255,255,255,0.5)", padding: "8px 12px", borderRadius: "8px",
+                      fontSize: "0.82rem", fontWeight: "700", cursor: "pointer", whiteSpace: "nowrap"
+                    }}
+                  >
+                    ⚫ DOA
+                  </button>
+                  <button
                     onClick={() => handleRemove(patient.id)}
                     style={{
                       background: "rgba(255,51,102,0.08)", border: "1px solid rgba(255,51,102,0.2)",

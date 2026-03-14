@@ -65,6 +65,7 @@ function RegisterTab() {
 
   const getSeverityColor = (severity) => {
     switch(severity?.toLowerCase()) {
+      case "doa": return "#888888";
       case "critical": return "#ff3366";
       case "high": return "#ff6600";
       case "moderate": return "#ffcc00";
@@ -218,7 +219,7 @@ function RegisterTab() {
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
-                <span style={{ fontSize: "4.5rem", fontWeight: "900", color: triageData.score > 0 ? scoreColor : "rgba(255,255,255,0.2)", lineHeight: "1", transition: "color 0.5s" }}>
+                <span style={{ fontSize: "4.5rem", fontWeight: "900", color: triageData.severity === "DOA" ? "rgba(255,255,255,0.4)" : (triageData.score > 0 ? scoreColor : "rgba(255,255,255,0.2)"), lineHeight: "1", transition: "color 0.5s" }}>
                   {triageLoading ? "·" : triageData.score}
                 </span>
                 <span style={{ fontSize: "1.5rem", color: "rgba(255,255,255,0.3)" }}>/10</span>
@@ -288,9 +289,14 @@ function RegisterTab() {
               ))}
             </div>
 
-            {triageData.score >= 9 && (
+            {triageData.score >= 9 && triageData.severity !== "DOA" && (
               <div style={{ background: "rgba(255,51,102,0.1)", border: "1px solid rgba(255,51,102,0.3)", borderRadius: "8px", padding: "10px 14px", fontSize: "0.82rem", color: "#ff3366", fontWeight: "600" }}>
                 🚨 Critical — Immediate medical attention required
+              </div>
+            )}
+            {triageData.severity === "DOA" && (
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "10px 14px", fontSize: "0.82rem", color: "rgba(255,255,255,0.5)", fontWeight: "600" }}>
+                ⚫ DOA — Route directly to administrative/morgue processing
               </div>
             )}
             {triageData.score >= 7 && triageData.score < 9 && (

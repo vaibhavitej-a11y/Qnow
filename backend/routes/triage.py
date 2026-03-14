@@ -5,11 +5,16 @@ Falls back to rule-based scoring when API quota is exhausted.
 from flask import Blueprint, request, jsonify
 import json
 import re
+import os
 
 triage_bp = Blueprint("triage", __name__)
 
 # ── ESI Scoring Table (user-provided clinical reference) ──────────
 ESI_SCORES = {
+    # DOA (Bypass queue)
+    "doa": (0, "DOA"), "dead on arrival": (0, "DOA"),
+    "already dead": (0, "DOA"), "deceased": (0, "DOA"),
+
     # Critical 9-10
     "coma": (10, "Critical"), "cardiac arrest": (10, "Critical"),
     "not breathing": (10, "Critical"), "unresponsive": (10, "Critical"),
@@ -43,9 +48,10 @@ ESI_SCORES = {
     "prescription": (1, "Low"), "refill": (1, "Low"),
 }
 
-WAIT_TIMES = {"Critical": 0, "High": 10, "Moderate": 30, "Low": 60, "None": 45}
+WAIT_TIMES = {"DOA": 0, "Critical": 0, "High": 10, "Moderate": 30, "Low": 60, "None": 45}
 
 DOCTOR_MAP = {
+    "DOA": "doc_1",        # Administrative sign-off
     "Critical": "doc_2",   # Cardiology
     "High": "doc_2",
     "Moderate": "doc_1",   # General Medicine
@@ -53,6 +59,7 @@ DOCTOR_MAP = {
 }
 
 REASONS = {
+    "DOA": "Patient arrived deceased. Bypassing live triage for administrative/morgue processing.",
     "Critical": "Immediate life-threatening emergency requiring urgent intervention.",
     "High": "High-priority condition requiring prompt medical attention.",
     "Moderate": "Moderate condition — should be seen within the hour.",
@@ -69,13 +76,13 @@ def rule_based_triage(symptoms_text: str, is_emergency: bool):
 
     for keyword, (score, severity) in ESI_SCORES.items():
         if keyword in text:
-            if score > best_score:
+            if severity == "DOA" or score > best_score:
                 best_score = score
                 best_severity = severity
-                matched_reason = f"Symptom '{keyword}' detected — {REASONS[severity]}"
+                matched_reason = REASONS[severity] if severity == "DOA" else f"Symptom '{keyword}' detected — {REASONS[severity]}"
 
-    # Emergency toggle override: at minimum 9
-    if is_emergency and best_score < 9:
+    # Emergency toggle override: at minimum 9, UNLESS DOA
+    if is_emergency and best_score < 9 and best_severity != "DOA":
         best_score = 9
         best_severity = "Critical"
         matched_reason = "Manual emergency override applied — " + REASONS["Critical"]
@@ -93,7 +100,7 @@ def try_gemini_triage(symptoms, age, is_emergency, roster):
     """Try Gemini API. Returns None if quota exceeded or any error."""
     try:
         import google.generativeai as genai
-        genai.configure(api_key="AIzaSyCOzwIIpBmV10DoT-LLODmmFfVAiCNtPp4")
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
         model = genai.GenerativeModel(
             "gemini-2.5-flash",
             generation_config={"response_mime_type": "application/json"}
@@ -107,6 +114,7 @@ Symptoms: {symptoms}
 Emergency Toggle: {is_emergency}
 
 SCORING REFERENCE:
+- DOA (0): dead on arrival, already dead, deceased
 - CRITICAL (9-10): Coma/10, Cardiac arrest/10, Not breathing/10, Unresponsive/10, Stroke/9, Severe chest pain/9, Seizure/9, Severe bleeding/9, Anaphylaxis/9
 - HIGH (7-8): Chest pain/8, Head injury/8, Difficulty breathing/8, High fever/7, Fracture/7, Severe vomiting/7
 - MODERATE (4-6): Fever/5, Stomach pain/5, Migraine/5, Dizziness/5, Back pain/4, Sprain/4, Nausea/4
@@ -115,7 +123,7 @@ SCORING REFERENCE:
 Doctor roster: {roster}
 
 Return JSON only:
-{{"score": number, "severity": "Critical"|"High"|"Moderate"|"Low", "reasoning": "one sentence", "assigned_doctor_id": "doc_N", "estimated_wait": minutes}}
+{{"score": number, "severity": "DOA"|"Critical"|"High"|"Moderate"|"Low", "reasoning": "one sentence", "assigned_doctor_id": "doc_N", "estimated_wait": minutes}}
 """
         response = model.generate_content(prompt)
         if not response.text:

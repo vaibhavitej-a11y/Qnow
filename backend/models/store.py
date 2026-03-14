@@ -8,6 +8,10 @@ import json
 import os
 import random
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # ── File Paths ─────────────────────────────────────────────────────
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
@@ -37,7 +41,7 @@ DEFAULT_HOSPITALS = [
 import google.generativeai as genai
 
 # Securely set up the Gemini client with the user's provided key
-genai.configure(api_key="AIzaSyCOzwIIpBmV10DoT-LLODmmFfVAiCNtPp4")
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Configure the model to output strict JSON
 generation_config = genai.types.GenerationConfig(
@@ -221,6 +225,27 @@ def mark_patient_seen(patient_id):
         doctors[doc_id]["seen_today"] += 1
 
     add_notification(f"✅ {p['name']} was marked as seen", "success")
+    _save_db()
+    return p
+
+def mark_patient_deceased(patient_id):
+    """Mark as deceased (DOA/Deteriorated), remove from queue, do NOT update doctor 'seen' stats."""
+    if patient_id not in patients:
+        return None
+        
+    p = patients[patient_id]
+    
+    if patient_id in queue:
+        queue.remove(patient_id)
+        
+    p["status"] = "deceased"
+    p["seen_at"] = datetime.now().isoformat()
+    
+    # Still keep in the 'seen/history' list for hospital audit trails
+    if patient_id not in seen:
+        seen.append(patient_id)
+        
+    add_notification(f"⚫ SYSTEM ALERT: Patient {p['name']} status updated to Deceased. Doctor capacity freed.", "urgent")
     _save_db()
     return p
 

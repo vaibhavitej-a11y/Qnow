@@ -5,7 +5,7 @@ Queue management API endpoints for QNow 2.0.
 from flask import Blueprint, jsonify
 from models.store import (
     get_queue_state, mark_patient_seen, mark_next_patient,
-    remove_patient, get_stats, get_notifications
+    remove_patient, get_stats, get_notifications, mark_patient_deceased
 )
 from services.predictor import predict_all_waits
 from ws.socket import trigger_update
@@ -43,6 +43,17 @@ def api_mark_seen(patient_id):
 
     trigger_update()
     return jsonify({"message": "Patient marked as seen", "patient": patient})
+
+
+@queue_bp.route("/api/queue/mark-deceased/<patient_id>", methods=["POST"])
+def api_mark_deceased(patient_id):
+    """Mark a specific patient as deceased (DOA)."""
+    patient = mark_patient_deceased(patient_id)
+    if not patient:
+        return jsonify({"error": "Patient not found"}), 404
+
+    trigger_update()
+    return jsonify({"message": "Patient marked as deceased", "patient": patient})
 
 
 @queue_bp.route("/api/queue/next", methods=["POST"])
