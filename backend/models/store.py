@@ -49,7 +49,7 @@ generation_config = genai.types.GenerationConfig(
 )
 
 # Initialize the Gemini Flash model for speed/cost balance
-model = genai.GenerativeModel("gemini-1.5-flash", generation_config=generation_config)
+model = genai.GenerativeModel("gemini-2.5-flash", generation_config=generation_config)
 
 def assign_doctor_with_llm(patient_age, symptoms):
     """
