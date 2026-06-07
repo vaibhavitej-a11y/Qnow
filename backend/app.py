@@ -1,6 +1,23 @@
+import os
+import sys
+
+# Eventlet monkey patching is required on Render (Linux production) for Socket.IO concurrency.
+# Bypassed on Windows to prevent conflicts with standard library/watchdog during local dev.
+if os.environ.get("RENDER") or sys.platform != "win32":
+    try:
+        import eventlet
+        eventlet.monkey_patch()
+        print("[QNow] Eventlet monkey patching applied (Production).")
+    except ImportError:
+        print("[QNow] Warning: eventlet not installed.")
+else:
+    print("[QNow] Bypassing eventlet monkey patching on local Windows development.")
+
+
 """
 QNow Backend — Flask Application Entry Point.
 """
+
 
 from flask import Flask
 from flask_cors import CORS
@@ -38,5 +55,8 @@ def health():
 
 # ── Run ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    print("\n[QNow v2.0] Backend running on http://localhost:5000\n")
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    print(f"\n[QNow v2.0] Backend running on http://localhost:{port}\n")
+    socketio.run(app, host="0.0.0.0", port=port, debug=True, allow_unsafe_werkzeug=True)
+
