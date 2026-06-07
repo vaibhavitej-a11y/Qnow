@@ -1,9 +1,8 @@
-import os
 import sys
 
 # Eventlet monkey patching is required on Render (Linux production) for Socket.IO concurrency.
 # Bypassed on Windows to prevent conflicts with standard library/watchdog during local dev.
-if os.environ.get("RENDER") or sys.platform != "win32":
+if sys.platform != "win32":
     try:
         import eventlet
         eventlet.monkey_patch()
@@ -12,6 +11,9 @@ if os.environ.get("RENDER") or sys.platform != "win32":
         print("[QNow] Warning: eventlet not installed.")
 else:
     print("[QNow] Bypassing eventlet monkey patching on local Windows development.")
+
+import os
+
 
 
 """
