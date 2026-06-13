@@ -89,7 +89,11 @@ export function connectSocket(callbacks) {
 
   socket = io(BACKEND_URL, {
     transports: ['websocket', 'polling'],
-    reconnectionAttempts: 10,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 2000,
+    reconnectionDelayMax: 10000,
+    randomizationFactor: 0.5,
   });
 
   socket.on('connect', () => console.log('[WS] Connected'));
