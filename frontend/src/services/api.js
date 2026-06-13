@@ -3,8 +3,10 @@
  */
 import { io } from 'socket.io-client';
 
-const API_BASE = 'http://localhost:5000/api';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE = `${BACKEND_URL}/api`;
 let socket = null;
+
 
 // ── REST API Helpers ─────────────────────────────────────────
 
@@ -85,7 +87,7 @@ export const metaApi = {
 export function connectSocket(callbacks) {
   if (socket) return socket;
 
-  socket = io('http://localhost:5000', {
+  socket = io(BACKEND_URL, {
     transports: ['websocket', 'polling'],
     reconnectionAttempts: 10,
   });
